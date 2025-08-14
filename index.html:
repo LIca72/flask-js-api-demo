@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flask + JS Demo</title>
+</head>
+<body>
+  <h1>Flask + JavaScript Demo</h1>
+  <button id="helloBtn">Say Hello (GET)</button>
+  <input id="nameInput" placeholder="Enter name"/>
+  <button id="echoBtn">Send Name (POST)</button>
+  <pre id="result"></pre>
+
+  <script>
+    const helloBtn = document.getElementById("helloBtn");
+    const echoBtn = document.getElementById("echoBtn");
+    const nameInput = document.getElementById("nameInput");
+    const result = document.getElementById("result");
+
+    helloBtn.addEventListener("click", () => {
+      fetch("/api/hello").then(res => res.json()).then(data => {
+        result.textContent = JSON.stringify(data, null, 2);
+      });
+    });
+
+    echoBtn.addEventListener("click", () => {
+      fetch("/api/echo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: nameInput.value })
+      })
+      .then(res => res.json())
+      .then(data => {
+        result.textContent = JSON.stringify(data, null, 2);
+      });
+    });
+  </script>
+</body>
+</html>
