@@ -1,0 +1,39 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+tea_dict = {
+    "green": "Refreshing tea with a light grassy flavor",
+    "black": "Strong tea with a bold and rich taste",
+    "herbal": "Caffeine-free tea made from herbs and flowers"
+}
+
+@app.route("/tea/<tea_type>", methods=["GET"])
+def get_tea(tea_type):
+    key = tea_type.lower()
+    description = tea_dict.get(key)
+    if description:
+        return jsonify(name=key, description=description), 200
+    return jsonify(error="Tea not found"), 404
+
+@app.route("/tea", methods=["POST"])
+def add_tea():
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify(error="Invalid or missing JSON body"), 400
+
+    name = data.get("name")
+    description = data.get("description")
+
+    if not name or not description:
+        return jsonify(error="Please provide both 'name' and 'description'"), 400
+
+    key = name.lower()
+    if key in tea_dict:
+        return jsonify(error=f"Tea '{key}' already exists"), 409
+
+    tea_dict[key] = description
+    return jsonify(message="Tea created", name=key, description=description), 201
+
+if __name__ == "__main__":
+    app.run(debug=True)
